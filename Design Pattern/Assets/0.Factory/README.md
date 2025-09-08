@@ -1,1 +1,1 @@
-# Game-Design-Pattern
+# Factory패턴
