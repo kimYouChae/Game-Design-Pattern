@@ -29,11 +29,9 @@ public class SimpleDog  : SimplePet { }
 
 public class SimpleFactory : MonoBehaviour
 {
-    private SimplePetFacotry simpleFactory;
-
     private void Start()
     {
-        simpleFactory = new SimplePetFacotry();
+        SimplePetFacotry simpleFactory = new SimplePetFacotry();
 
         SimplePet simpleCat = simpleFactory.CreatePet(SimpleFactoryType.Cat);
         SimplePet simpleDog = simpleFactory.CreatePet(SimpleFactoryType.Dog);
