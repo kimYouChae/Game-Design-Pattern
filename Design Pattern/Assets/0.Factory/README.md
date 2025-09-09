@@ -278,3 +278,11 @@ public class AnimalProductManager : MonoBehaviour
 - Pooling 생성 시 위에서 생성한 Factory를 매개변수로
 - Pooling에서 Get 시 성공적으로 가져오는것을 확인할 수 있음
 ```
+
+<br>
+
+- Factory Method와 Pooling을 클래스다이어램으로 표현한 그림
+  - 의존관계를 보면 Factory Method와 동일한것을 확인할 수 있음 
+<img width="1222" height="447" alt="Image" src="https://github.com/user-attachments/assets/20c5d360-d068-456f-9394-022d69683d87" />
+
+<br>
