@@ -1,20 +1,31 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MVCView : MonoBehaviour
 {
-    public TextMeshProUGUI healthText;
-    public TextMeshProUGUI nameText;
+    public TMP_InputField inputField;
+    public Button enterButton;
 
-    public void UpdateHealth(int health) 
+    public TextMeshProUGUI infoText;
+
+    private Action<string> enterNickNameAction;
+
+    public void RegisterCreatePlayer(Action<string> action) 
     {
-        healthText.text = health.ToString();
+        enterNickNameAction += action;
     }
 
-    public void UpdateName(string name) 
+    public void Start()
     {
-        nameText.text = name;
+        enterButton.onClick.AddListener(() => enterNickNameAction?.Invoke( inputField.text ));
+    }
+
+    public void UpdatePlayerInfo(string str) 
+    {
+        infoText.text = str;
     }
 }

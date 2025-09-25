@@ -1,27 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MVCController : MonoBehaviour
+public class MVCController 
 {
-    private MVCPlayer mvcPlayer;
+    private MVCModel mvcModel;
     private MVCView mvcView;
 
-    private void Start()
+    public MVCController(MVCModel model, MVCView view) 
     {
-        mvcPlayer = new MVCPlayer(10, "Potato");
-        mvcView = this.GetComponent<MVCView>();
+        this.mvcModel = model;
+        this.mvcView = view;
 
-        mvcView.UpdateHealth(mvcPlayer.Health);
-        mvcView.UpdateName(mvcPlayer.Name);
+        mvcView.RegisterCreatePlayer(UpdateUserInfo);
     }
 
-    private void Update()
+    public void UpdateUserInfo(string name) 
     {
-        if (Input.GetKeyDown(KeyCode.Space)) 
-        {
-            mvcPlayer.Health += 10;
-            mvcView.UpdateHealth(mvcPlayer.Health);
-        }
+        mvcModel.NickName(name);
+
+        Debug.Log("생성한 플레이어의 이름은" + mvcModel.player.NickName);
+
+        // UI 업데이트
+        mvcView.UpdatePlayerInfo(mvcModel.player.PlayerInfo());
     }
 }
