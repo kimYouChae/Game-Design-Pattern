@@ -7,20 +7,20 @@ using UnityEngine.UI;
 public class UIPopUP : MonoBehaviour
 {
     [Header("===State===")]
-    [SerializeField] protected float onStartSize;   // ON : ÆË¾÷ ½ÃÀÛ »çÀÌÁî
-    [SerializeField] protected float oriSize;       // ¿ø·¡ »çÀÌÁî ( ±âº» : 1f )
-    [SerializeField] protected float offEndSize;    // Off : ÆË¾÷ ³¡ »çÀÌÁî
+    [SerializeField] protected float onStartSize;   // ON : íŒì—… ì‹œì‘ ì‚¬ì´ì¦ˆ
+    [SerializeField] protected float oriSize;       // ì›ë˜ ì‚¬ì´ì¦ˆ ( ê¸°ë³¸ : 1f )
+    [SerializeField] protected float offEndSize;    // Off : íŒì—… ë ì‚¬ì´ì¦ˆ
 
-    [SerializeField] protected float startTime;     // OnÇÒ ¶§ ÆË¾÷ ÁøÇà ¼Óµµ
-    [SerializeField] protected float endTime;       // OffÇÒ ¶§ ÆË¾÷ ÁøÇà ¼Óµµ
+    [SerializeField] protected float startTime;     // Oní•  ë•Œ íŒì—… ì§„í–‰ ì†ë„
+    [SerializeField] protected float endTime;       // Offí•  ë•Œ íŒì—… ì§„í–‰ ì†ë„
 
-    [SerializeField] protected Ease popUpEase;      // ÆË¾÷ ºÎµå·¯¿î ÀÌµ¿ ( ±âº» : Ease.OutBack )
+    [SerializeField] protected Ease popUpEase;      // íŒì—… ë¶€ë“œëŸ¬ìš´ ì´ë™ ( ê¸°ë³¸ : Ease.OutBack )
 
     [Header("===Button===")]
     [SerializeField] protected Button closeButton;
 
 
-    // MonoÀÇ »ı¸íÁÖ±â ÇÔ¼ö awake -> onEnable -> start
+    // Monoì˜ ìƒëª…ì£¼ê¸° í•¨ìˆ˜ awake -> onEnable -> start
     void Awake()
     {
         onStartSize = 0.8f;
@@ -31,41 +31,46 @@ public class UIPopUP : MonoBehaviour
 
         popUpEase = Ease.OutBack;
 
-        // ¼öÄ¡ Á¶Á¤ ÇÊ¿ä ½Ã ÇÏÀ§¿¡¼­ ÃÊ±âÈ­ 
+        // ìˆ˜ì¹˜ ì¡°ì • í•„ìš” ì‹œ í•˜ìœ„ì—ì„œ ì´ˆê¸°í™” 
         InitPopUpState();
 
         closeButton.onClick.AddListener(() =>
         {
-            // Debug.Log("close¹öÆ°");
+            // Debug.Log("closeë²„íŠ¼");
             OffPanel();
         });
+
+        // ê¸°íƒ€ ë“±ë“± ì´ˆê¸°í™” 
+        Initpopup();
     }
 
     void OnEnable()
     {
-        // ÄÑÁú ¶§
+        // ì¼œì§ˆ ë•Œ
         PlayShowAnimation(onStartSize, oriSize, startTime, popUpEase);
     }
 
-    #region ÇÊ¿äÇÏ¸é ÇÏÀ§¿¡¼­ override
+    #region í•„ìš”í•˜ë©´ í•˜ìœ„ì—ì„œ override
 
-    // popup ¼öÄ¡ Á¶Á¤ ÇÊ¿äÇÒ ¶§ 
+    // popup ìˆ˜ì¹˜ ì¡°ì • í•„ìš”í•  ë•Œ 
     protected virtual void InitPopUpState() { }
+    // ê¸°íƒ€ë“±ë“± ì´ˆê¸°í™” í•„ìš”í•  ë•Œ 
+    protected virtual void Initpopup() { }
 
     #endregion
 
     protected void PlayShowAnimation(float startSize, float endSize, float speed, Ease ease)
     {
-        // Debug.Log($"{startSize} ºÎÅÍ {endSize} ±îÁö Å©±â Ä¿Áü {speed}ÀÇ ¼Óµµ·Î ");
-        // ÄÓ ¶§ onStartSize  -> oriSize ¸¸Å­       , startTime ÀÇ ¼Óµµ·Î
-        // ²ø ¶§ oriSize      -> offEndSize ¸¸Å­    , endTimeÀÇ ¼Óµµ·Î 
+        // Debug.Log($"{startSize} ë¶€í„° {endSize} ê¹Œì§€ í¬ê¸° ì»¤ì§ {speed}ì˜ ì†ë„ë¡œ ");
+        // ì¼¤ ë•Œ onStartSize  -> oriSize ë§Œí¼       , startTime ì˜ ì†ë„ë¡œ
+        // ëŒ ë•Œ oriSize      -> offEndSize ë§Œí¼    , endTimeì˜ ì†ë„ë¡œ 
         transform.localScale = Vector3.one * startSize;
         transform.DOScale(Vector3.one * endSize, speed).SetEase(ease);
     }
 
     public void OffPanel()
     {
-        // ²¨Áú ¶§ 
+        // êº¼ì§ˆ ë•Œ 
         PlayShowAnimation(oriSize, offEndSize, endTime, popUpEase);
 
         Invoke(nameof(SetActiveFalsePanel), endTime / 2);
