@@ -1,288 +1,289 @@
-### 생성패턴 🔜 Factory패턴
+### 유저 인터페이스 🔜 MVC 패턴
 
 - 목차
-  - [심플 펙토리](#Simple-Factory)
-  - [펙토리 메서드](#Factory-Method-패턴)
-  - [펙토리 메서드 + Pooling](#Factory-Method-패턴과-Pooling-유틸리티)
+  - [MVC](#MVC-(-모델-뷰-컨트롤러-))
+  - [MVC패턴과 팝업 시스템](#MVC-패턴과-Popup-시스템)
 
 <hr>
 
-# ✨Simple Factory
+# ✨MVC ( 모델 뷰 컨트롤러 )
+
+⏩게임에서 화면과 게임로직, 데이터를 분리해서 서로 독립적으로 관리하는 디자인패턴
+
+| Model | View | Controller |
+| :-: | :-: | :-: |
+| 데이터를 저장하는 컨테이너 | 인터페이스에 관해 담아두는 곳 | 게임데이터를 바탕으로 인터페이스에 보여주는 로직을 작성하는곳 |
+
+<br>
+
+<img width="442" height="321" alt="Image" src="https://github.com/user-attachments/assets/e9998747-c74d-4bdc-80be-4691360b20fa" />
+
+<br>
+
+_출처 : Unity 레벨업 유어 코드_
+
+<br>
+
+<details>
+  <summary> MVC Model </summary>
+    
 ``` c#
-public class SimplePetFacotry 
+public class MVCModel 
 {
-    public SimplePet CreatePet(SimpleFactoryType type) 
+    public Player1 player;
+
+    public MVCModel(Player1 pr)
     {
-        switch (type) 
-        {
-            case SimpleFactoryType.Cat:
-                return new SimpleCat();
-            case SimpleFactoryType.Dog:
-                return new SimpleDog();
-        }
-        return null;
+        this.player = pr;
+    }
+
+    public void NickName(string n) 
+    {
+        player.UpdateNickName(n);
     }
 }
 ```
-- client에서 직접적으로 생성하지 않고, Factory에 생성코드를 작성함으로써 나중에 클래스가 추가/수정 될 때 Factory 내부만 변경하면 됨
-  
-| 장점 | 단점 |
-| :-: | :-: |
-| Factory가 객체의 생성을 담당하며, 확장이 용이함 | 확장할 때 기존 코드를 수정해야 함|
+</details>
 
-⏩ **Factory Method나 추상 펙토리를 사용한다면 기존 클래스에 영향을 주지 않고 확장이 가능함.**
+``` c#
+- 현재 플레이어의 데이터를 담아두는 역할로 사용하고 있음.
+- 문제는 Model에서 플레이어를 참조하는 방식이 맞는지 의문이 듬.
+- 현재는 Model이 가볍지만, 복잡해질 경우 해당 방식은 더 고민이 필요할듯
+```
+
+<br>
+
+<details>
+  <summary> MVC View </summary>
+    
+``` c#
+public class MVCView : MonoBehaviour
+{
+    public TMP_InputField inputField;
+    public Button enterButton;
+
+    public TextMeshProUGUI infoText;
+
+    private Action<string> enterNickNameAction;
+
+    public void RegisterCreatePlayer(Action<string> action) 
+    {
+        enterNickNameAction += action;
+    }
+
+    public void Start()
+    {
+        enterButton.onClick.AddListener(() => enterNickNameAction?.Invoke( inputField.text ));
+    }
+
+    public void UpdatePlayerInfo(string str) 
+    {
+        infoText.text = str;
+    }
+}
+```
+</details>
+
+``` c#
+- UI 컴포넌트에 관한 정보를 담고있음
+- Button등에 연결할 동작은 `Action` 을 통해서 연결해줌
+- UI 업데이트 로직만 작성, 실행은 Controller에서 실행
+```
+
+<br>
+
+<details>
+  <summary> MVC Controller </summary>
+
+``` c#
+public class MVCController 
+{
+    private MVCModel mvcModel;
+    private MVCView mvcView;
+
+    public MVCController(MVCModel model, MVCView view) 
+    {
+        this.mvcModel = model;
+        this.mvcView = view;
+
+        mvcView.RegisterCreatePlayer(UpdateUserInfo);
+    }
+
+    public void UpdateUserInfo(string name) 
+    {
+        mvcModel.NickName(name);
+
+        Debug.Log("생성한 플레이어의 이름은" + mvcModel.player.NickName);
+
+        // UI 업데이트
+        mvcView.UpdatePlayerInfo(mvcModel.player.PlayerInfo());
+    }
+}
+```
+</details>
+
+``` c#
+- model과 view의 로직을 처리해주는 컨트롤러
+- 생성자 실행과 동시에 View의 액션에 동작을 추가해줌
+```
 
 <br>
 <hr>
+    
+# ✨MVC 패턴과 Popup 시스템
 
-# ✨Factory Method 패턴
-⏩ Factory Method 패턴은 **객체를 생성할 떄 어떤 클래스의 인스턴스를 만들 지 서브 클래스에서 결정하는 패턴**
-
-| 장점 | 단점 |
-| :-: | :-: |
-| 수정에는 닫혀있고, 확장에는 열려 있는 구조 | 확장할 때 클래스를 추가해야 함으로 코드량이 늘어남 |
-
-<br>
-
-<img width="835" height="507" alt="Image" src="https://github.com/user-attachments/assets/0ce41526-d29b-4a47-9da7-a7dae7d93731" />
-
-<br> 
-
-_출처 : 리펙토링 구루 Factory Method 패턴_
-
-<br>
-
-- Product에 해당 하는 부분 (ex Animal)은 Product 인터페이스를 구현
-``` c#
-public interface IFactoryMethod 
-{
-    void SignUp(); 
-}
-
-public class FactoryMethodDog : IFactoryMethod
-{
-    public void SignUp()
-    {
-        Debug.Log("Factory Method Dog");   
-    }
-}
-
-public class FacotryMethodCat : IFactoryMethod
-{
-    public void SignUp()
-    {
-        Debug.Log("Factory Method Cat");
-    }
-}
-```
-
-<br>
-
-- Creator은 생성을 담당하는 abstract 클래스
-    - 객체를 생성할 때 어떤 클래스의 인스턴스를 만들 지 서브 클래스에서 결정 
-``` c#
-public abstract class AnimalFactoryMethod 
-{
-    public IFactoryMethod CreateMethod() 
-    {
-        IFactoryMethod method = CreateAnimal();
-        method.SignUp();
-        return method;  
-    }
-
-    protected abstract IFactoryMethod CreateAnimal();
-}
-
-public class CatFactoryMethodFacotry : AnimalFactoryMethod
-{
-    protected override IFactoryMethod CreateAnimal()
-    {
-        return new FacotryMethodCat();
-    }
-}
-```
-<br>
-
-- Client에서는 Factory를 생성하여 사용
-``` c#
-public class FactoryMethod : MonoBehaviour
-{
-
-    void Start()
-    {
-        AnimalFactoryMethod animalFactoryMethod = new CatFactoryMethodFacotry();
-
-        IFactoryMethod cat = animalFactoryMethod.CreateMethod();
-
-    }
-
-}
-```
-
-<br>
-
-- Factory Method에서 새로운 동물인 Bird를 추가할 때,
-
-```
-생성을 담당하는 abstract 클래스를 상속받아 하위 클래스에서 생성을 구현하면 된다.
-    - 이로써 Simple Factory에서 새로운 클래스를 생성할 때 Factory코드를 수정해야 한다는 단점을 개선할 수 있다.
-        - `수정에는 닫혀있고 확장에는 열려 있다`
-    - Bird를 추가한 것 처럼 새로운 클래스가 추가되게 되면 클래스 양이 많아질 수 있다.
-```
-
-``` c#
-public class BirdFactory : AnimalFactoryMethod
-{
-    protected override IFactoryMethod CreateAnimal()
-    {
-        return new Bird();
-    }
-}
-
-// 사용 시 
-// AnimalFactoryMethod animalFactoryMethod = new BirdFactory();
-// IFactoryMethod bird = animalFactoryMethod.CreateMethod();
-```
-      
-<br>
-<hr>
-
-# ✨Factory Method 패턴과 Pooling 유틸리티
-
-- 풀링 유틸리티에 관한 자세한 내용은 아래 블로그를 참고, 지금은 Factory Method와 연결하여 설명
-  - https://youcheachae.tistory.com/69
+- Popup 시스템에 관한 자세한 내용은 아래 블로그를 참고
+  - [https://youcheachae.tistory.com/69](https://youcheachae.tistory.com/63)
  
-<br>
-
-- Product에 해당 하는 부분
-  - Animal들은 AnimalProduct 인터페이스를 구현한다.
-
-``` c#
-public interface AnimalProduct
-{
-    void IMoveAnimal();
-}
-```
-``` c#
-public class CatProduct : MonoBehaviour , AnimalProduct
-{
-    public void IMoveAnimal()
-    {
-        Debug.Log("Cat Product Move Animal");
-    }
-
-}
-```
-``` c#
-public class DogProduct : MonoBehaviour, AnimalProduct
-{
-    public void IMoveAnimal()
-    {
-        Debug.Log("Dog Product Move Animal");
-    }
-
-}
-```
-
-<br>
-
-- Creator에 해당하는 부분
+- 데이터와 UI가 명확히 분리되는 인벤토리를 예시로 들었음
+  
+<details>
+  <summary> Inventory Model </summary>
 
 ``` c#
-public abstract class AnimalProductFactory<T> : IObjectFactory<T>
-    where T : Component, AnimalProduct
+public class InventoryModel
 {
-    protected GameObject prefab;
-    protected Color color;
+    // 인벤토리 최대 슬롯 갯수
+    public int maxSlot = 5;
+    
+    // 인벤토리 내 아이템 리스트
+    public List<Item> items = new List<Item>();
 
-    // 필요한 정보 초기화
-    public AnimalProductFactory(GameObject pre, Color color)
-    {
-        this.prefab = pre;
-        this.color = color;
-    }
-
-    protected abstract AnimalProduct CreateAnimal();
-
-    // 생성할 때 사용하는 인터페이스 메서드 
-    public T CreateInstance()
-    {
-        return (T)CreateAnimal();
-    }
+    // 인덱스에 해당하는 아이템
+    public Item IndexItem(int index) => items[index];
 }
 ```
+</details>
 
-```
-- ObjectPooling을 사용하기 위해서는 Factory는 반드시 `IObjectFactory` 를 구현해야한다.
-- AnimalProductFactory가 제네릭 클래스인 이유
-    - IObjectFactory가 제네릭 클래스이기 때문에, 그걸 구현하는 AnimalProductFactory도 제네릭이여야한다
-    - Animal과 관련된 Factory이기 때문에 T는 AnimalProduct를 구현하는 클래스만 가능하다. 즉, AnimalProduct 까지 제약을 걸어주면 안정성이 있다.
-```
-
-<br>
-
-- creator을 구현하는 ConcreateCreatorA와 B에 해당 하는 부분
-    - 어떤 클래스의 인스턴스를 만들지는 하위클래스에 결정함.
-
+<details>
+  <summary> Inventory View </summary>
+    
 ``` c#
-
-public class CatProductFactory : AnimalProductFactory<CatProduct>
+public class InventoryView : MonoBehaviour
 {
-    public CatProductFactory(GameObject pre, Color color) : base(pre, color) { }
+    [SerializeField] Image[] itemIconSlot;
+    [SerializeField] TextMeshProUGUI[] itemNameText;
 
-    protected override AnimalProduct CreateAnimal()
+    [SerializeField] Button itemAddButton;
+    [SerializeField] Button itemDeleteButton;
+
+    private Action itemAddAction;
+    private Action itemDeleteAction;
+
+    private void Awake()
     {
-        GameObject obj = GameObject.Instantiate(prefab);
-        return obj.GetComponent<CatProduct>();
+        itemAddButton.onClick.AddListener(() => itemAddAction?.Invoke());
+        itemDeleteButton.onClick.AddListener(() => itemDeleteAction?.Invoke());
     }
-}
 
-public class DobProdcutFacotry : AnimalProductFactory<DogProduct>
-{
-    public DobProdcutFacotry(GameObject pre, Color color) : base(pre, color) { }
-
-    protected override AnimalProduct CreateAnimal()
+    public void RegisterItemAdd(Action addAction)
     {
-        GameObject obj = GameObject.Instantiate(prefab);
-        return obj.GetComponent<DogProduct>();
+        itemAddAction += addAction;
+    }
+
+    public void RegisterItemDelete(Action deleteAction)
+    {
+        itemDeleteAction += deleteAction;
+    }
+
+    public void UpdateItemSlot(int idx, string name, Sprite icon)
+    {
+        itemIconSlot[idx].sprite = icon;
+        itemNameText[idx].text = name;
+    }
+
+    public void ResetItemSlot()
+    {
+        for (int i = 0; i < itemIconSlot.Length; i++)
+        {
+            itemIconSlot[i].sprite = null;
+            itemNameText[i].text = string.Empty;
+        }
     }
 }
 ```
-
-<br>
-
-- Client에서 사용하는 부분
-
+</details>
+    
+<details>
+  <summary> Inventory Controller </summary>
+    
 ``` c#
-public class AnimalProductManager : MonoBehaviour
+public class InventoryController 
 {
-    [SerializeField] Transform parent;
-    [SerializeField] GameObject catPrefab;
-    [SerializeField] Color catColor;
+    private InventoryModel inventoryModel;
+    private InventoryView inventoryView;
 
-    void Start()
+    public InventoryController(InventoryModel inventoryModel, InventoryView inventoryPopup)
     {
-        // 펙토리 생성
-        AnimalProductFactory<CatProduct> animal1 = new CatProductFactory(catPrefab, catColor);
+        this.inventoryModel = inventoryModel;
+        this.inventoryView = inventoryPopup;
 
-        // 풀링 생성
-        ObjectPool<CatProduct> catPooling = new ObjectPool<CatProduct>(animal1, 10, parent);
-
-        // 풀링에서 가져오기 
-        CatProduct cat = catPooling.GetPoolAsT();
+        inventoryPopup.RegisterItemAdd(AddItem);
+        inventoryPopup.RegisterItemDelete(DeleteItem);
     }
-```
 
+    // 아이템 추가 로직
+    private void AddItem() 
+    {
+        Item randItem = MVC_ItemManager.instance.GetRandomItem();
+
+        // model 에 아이템 추가
+        // max를 넘지 않았으면 
+        if (inventoryModel.items.Count < inventoryModel.maxSlot)
+        { 
+            inventoryModel.items.Add(randItem);
+        }
+
+        // 인벤토리 업데이트
+        UpdateInventory();
+    }
+
+    // 아이템 삭제 로직
+    private void DeleteItem() 
+    {
+        // 현재 마지막 아이템 삭제
+        inventoryModel.items.RemoveAt( inventoryModel.items.Count - 1);
+
+        // 인벤토리 업데이트
+        inventoryView.ResetItemSlot();
+        UpdateInventory();
+    }
+
+    public void UpdateInventory() 
+    {
+        // UI 업데이트 
+        for (int i = 0; i < inventoryModel.items.Count; i++)
+        {
+            Item curritem = inventoryModel.IndexItem(i);
+            inventoryView.UpdateItemSlot(i, curritem.ItemName, curritem.IconSprite);
+        }
+    }
+}
 ```
-- CatProduct에 해당하는 Factory 생성
-- Pooling 생성 시 위에서 생성한 Factory를 매개변수로
-- Pooling에서 Get 시 성공적으로 가져오는것을 확인할 수 있음
-```
+</details>
 
 <br>
 
-- Factory Method와 Pooling을 클래스다이어램으로 표현한 그림
-  - 의존관계를 보면 Factory Method와 동일한것을 확인할 수 있음 
-<img width="1222" height="447" alt="Image" src="https://github.com/user-attachments/assets/20c5d360-d068-456f-9394-022d69683d87" />
+### 🔍 팝업 내부에서 MVC를 초기화
+
+- 기존에는 LobbyManager같은 외부 매니져에서 MVC를 초기화 했음 (LobbyUIManager 참고 )
+``` c#
+mvcModel = new MVCModel(player);
+mvcView = GetComponent<MVCView>();
+mvcController = new MVCController(mvcModel, mvcView);
+```
+
+→ 하지만 Popup의 경우에는 Model, View, Controller가 팝업에 연관된 데이터흐름이기 때문에 <br>
+팝업 내부에서 MVC를 구성하는것이 더 적합하다고 판단
 
 <br>
+
+- 이를 위해 UIPopUp 클래스의 Initpopup() 메서드를 override 하여 초기 1회 MVC 를 초기화 하게 만들었음
+``` c#
+protected override void Initpopup() 
+{
+    InventoryView view = GetComponent<InventoryView>();
+    InventoryModel model = new InventoryModel();
+    inventoryController = new InventoryController(model, view);
+}
+```
