@@ -3,45 +3,18 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryPopup : UIPopUP
+public class InventoryPopup  : UIPopUP
 {
-    [SerializeField] Image[] itemIconSlot;
-    [SerializeField] TextMeshProUGUI[] itemNameText;
-
-    [SerializeField] Button itemAddButton;
-    [SerializeField] Button itemDeleteButton;
-
-    private Action itemAddAction;
-    private Action itemDeleteAction;
-
-    protected override void Initpopup()
+    // inventory 팝업의 MVC를 여기서 관리
+    protected override void Initpopup() 
     {
-        itemAddButton.onClick.AddListener(() => itemAddAction?.Invoke());
-        itemDeleteButton.onClick.AddListener(() => itemDeleteAction?.Invoke());
-    }
+        // view
+        InventoryView view = GetComponent<InventoryView>();
 
-    public void RegisterItemAdd(Action addAction) 
-    {
-        itemAddAction += addAction;
-    }
+        // model
+        InventoryModel model = new InventoryModel();
 
-    public void RegisterItemDelete(Action deleteAction)
-    {
-        itemDeleteAction += deleteAction;
-    }
-
-    public void UpdateItemSlot( int idx ,string name, Sprite icon) 
-    {
-        itemIconSlot[idx].sprite = icon;
-        itemNameText[idx].text = name;
-    }
-
-    public void ResetItemSlot() 
-    {
-        for (int i = 0; i < itemIconSlot.Length; i++) 
-        {
-            itemIconSlot[i].sprite = null;
-            itemNameText[i].text = string.Empty;
-        }
+        // Controller
+        InventoryController inventoryController = new InventoryController(model, view);
     }
 }

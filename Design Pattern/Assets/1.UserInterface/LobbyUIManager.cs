@@ -72,18 +72,7 @@ public class LobbyUIManager : MonoBehaviour
         // 해당 UI 패턴들은 모두 Player1의 데이터를 다룬다
         player = new Player1("", 100,5,7,3);
 
-        InitMVCExample();
-
-        // mvp 팝업
-        
-        // view
-        InventoryPopup popup = UIManager.Instance.GetPopUP<InventoryPopup>();
-        popup.OffPanel();
-        // model
-        InventoryModel model = new InventoryModel();
-        // Controller
-        InventoryController inventoryController = new InventoryController(model, popup);
-                
+        InitMVCExample();        
     }
 
     private void InitMVCExample() 

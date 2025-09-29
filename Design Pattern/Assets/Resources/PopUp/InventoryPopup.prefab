@@ -240,6 +240,7 @@ GameObject:
   - component: {fileID: 101007779065043765}
   - component: {fileID: 5987415007113599387}
   - component: {fileID: 6510085890571153517}
+  - component: {fileID: 1102022147143599830}
   m_Layer: 5
   m_Name: InventoryPopup
   m_TagString: Untagged
@@ -327,6 +328,18 @@ MonoBehaviour:
   endTime: 0
   popUpEase: 0
   closeButton: {fileID: 1523333055280717724}
+--- !u!114 &1102022147143599830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728902371079485754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81eece8a2f256bf4dadc3f52440f91fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   itemIconSlot:
   - {fileID: 3074774426253884860}
   - {fileID: 4458715357763459251}

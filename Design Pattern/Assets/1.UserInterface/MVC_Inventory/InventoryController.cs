@@ -6,9 +6,9 @@ using UnityEngine;
 public class InventoryController 
 {
     private InventoryModel inventoryModel;
-    private InventoryPopup inventoryView;
+    private InventoryView inventoryView;
 
-    public InventoryController(InventoryModel inventoryModel, InventoryPopup inventoryPopup)
+    public InventoryController(InventoryModel inventoryModel, InventoryView inventoryPopup)
     {
         this.inventoryModel = inventoryModel;
         this.inventoryView = inventoryPopup;
