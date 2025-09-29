@@ -44,7 +44,7 @@ public class InventoryController
         UpdateInventory();
     }
 
-    private void UpdateInventory() 
+    public void UpdateInventory() 
     {
         // UI 업데이트 
         for (int i = 0; i < inventoryModel.items.Count; i++)

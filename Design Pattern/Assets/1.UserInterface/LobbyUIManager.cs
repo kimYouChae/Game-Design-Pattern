@@ -64,6 +64,7 @@ public class LobbyUIManager : MonoBehaviour
         mvcPopupButton.onClick.AddListener(() => 
         {
             InventoryPopup popup = UIManager.Instance.GetPopUP<InventoryPopup>();
+            popup.InitInventory();
         });
     }
 
